@@ -1,0 +1,35 @@
+version: "3"
+
+services:
+  nginx:
+    image: nginx
+    ports:
+      - 8080:80
+    volumes:
+      - ./src:/src
+      - ./site.conf:/etc/nginx/conf.d/default.conf
+      - ./wp-config.php:/src/wp-config.php
+
+    links:
+      - php
+  db:
+    image: mysql
+    ports:
+      - 3306:3306
+    restart: always
+    environment:
+      MYSQL_DATABASE: wordpress
+      MYSQL_ROOT_PASSWORD: toor
+    volumes:
+      - db-data:/var/lib/mysql/
+  php:
+    build:
+      context: .
+      dockerfile: ./php/Dockerfile
+    image: php:7-fpm
+    volumes:
+      - ./src:/src
+      - ./wp-config.php:/src/wp-config.php
+
+volumes:
+  db-data:
